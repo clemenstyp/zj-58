@@ -20,6 +20,11 @@ struct settings_
 	int cashDrawer2;
 	int blankSpace;
 	int feedDist;
+	int heatingdots; 
+	int heatingtime;
+	int heatinginterval;
+	int printdensity;
+	int printbreaktime;
 };
 struct settings_ settings;
 
@@ -100,6 +105,22 @@ inline void skiplines(int size)
 	mputchar(size);
 }
 
+inline void setPrintSettings(int  heatingdots,int heatingtime,int heatinginterval)
+{
+	mputchar(0x27);       // Esc
+	mputchar(0x55);       // 7 (print settings)
+	mputchar(heatingdots);      
+	mputchar(heatingtime);
+	mputchar(heatinginterval);	
+}
+
+inline void setPrintDensity(int  printBreakTime,int printDensity)
+{
+	mputchar(0x18);       # DC2
+	mputchar(0x35);       # Print density
+	mputchar(((byte) printBreakTime << 5) | (byte) printDensity)
+}
+
 // get an option
 inline int getOptionChoiceIndex(const char * choiceName, ppd_file_t * ppd)
 {
@@ -141,6 +162,12 @@ inline void initializeSettings(char * commandLineOptionSettings)
 	settings.cashDrawer2  = getOptionChoiceIndex("CashDrawer2Setting", ppd);
 	settings.blankSpace   = getOptionChoiceIndex("BlankSpace"        , ppd);
 	settings.feedDist     = getOptionChoiceIndex("FeedDist"          , ppd);
+	settings.heatingdots     = getOptionChoiceIndex("HeatingDots"          , ppd);
+	settings.heatingtime     = getOptionChoiceIndex("HeatingTime"          , ppd);
+	settings.heatinginterval     = getOptionChoiceIndex("HeatingInterval"          , ppd);
+	settings.printdensity   = getOptionChoiceIndex("PrintDensity"          , ppd);
+	settings.printbreaktime =  getOptionChoiceIndex("printBreakTime"          , ppd);
+	
 
 	ppdClose(ppd);
 }
@@ -152,7 +179,9 @@ void jobSetup()
 		outputCommand(cashDrawerEject[0]);
 	if ( settings.cashDrawer2==1 )
 		outputCommand(cashDrawerEject[1]);
-	outputCommand(printerInitializeCommand);
+	outputCommand(printerInitializeCommand);	
+	setPrintSettings(settings.heatingdots,settings.heatingtime,settings.heatinginterval);
+	setPrintDensity(settings.printdensity,settings.printbreaktime)
 }
 
 // sent at the very end of print job
