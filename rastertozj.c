@@ -106,7 +106,17 @@ inline void skiplines(int size)
 	mputchar(size);
 }
 
-inline void setPrintSettings(int  heatingdots,int heatingtime,int heatinginterval)
+//Set “max heating dots”,”heating time”, “heating interval”
+//n1 = 0-255 Max printing dots，Unit(8dots)，Default:7(64 dots)
+//n2 = 3-255 Heating time，Unit(10us),Default:80(800us)
+//n3 = 0-255 Heating interval,Unit(10us)，Default:2(20us)
+//The more max heting dots, the more peak current will cost
+//whenprinting, the faster printing speed. The max heating dots is 8*(n1+1)
+//The more heating time, the more density , but the slower printing
+//speed. If heating time is too short, blank page may occur.
+//The more heating interval, the more clear, but the slower
+//printingspeed. 
+inline void setPrintSettings(char heatingdots,char heatingtime,char heatinginterval)
 {
 	mputchar(0x27);       // Esc
 	mputchar(0x55);       // 7 (print settings)
@@ -115,7 +125,11 @@ inline void setPrintSettings(int  heatingdots,int heatingtime,int heatinginterva
 	mputchar(heatinginterval);	
 }
 
-inline void setPrintDensity(int  printBreakTime,int printDensity)
+//D4..D0 of n is used to set the printing density
+//Density is 50% + 5% * n(D4-D0) printing density
+//D7..D5 of n is used to set the printing break time
+//Break time is n(D7-D5)*250us 
+inline void setPrintDensity(char  printBreakTime,char printDensity)
 {
 	mputchar(0x18);       # DC2
 	mputchar(0x35);       # Print density
