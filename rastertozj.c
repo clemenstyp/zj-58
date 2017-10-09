@@ -11,7 +11,7 @@
 // uncomment next line in order to have verbose dump in DEBUGFILE
 // after print
 
-//#define DEBUGP
+#define DEBUGP
 
 #define DEBUGFILE "/tmp/debugraster.txt"
 
@@ -118,8 +118,8 @@ inline void skiplines(int size)
 //printingspeed. 
 inline void setPrintSettings(char heatingdots,char heatingtime,char heatinginterval)
 {
-	mputchar(0x27);       // Esc
-	mputchar(0x55);       // 7 (print settings)
+	mputchar(0x1B);       // Esc
+	mputchar(0x37);       // 7 (print settings)
 	mputchar(heatingdots);      
 	mputchar(heatingtime);
 	mputchar(heatinginterval);	
@@ -131,8 +131,8 @@ inline void setPrintSettings(char heatingdots,char heatingtime,char heatinginter
 //Break time is n(D7-D5)*250us 
 inline void setPrintDensity(char  printBreakTime,char printDensity)
 {
-	mputchar(0x18);       // DC2
-	mputchar(0x35);       // Print density
+	mputchar(0x12);       // DC2
+	mputchar(0x23);       // Print density
 	mputchar(((char) printBreakTime << 5) | (char) printDensity);
 }
 
@@ -154,7 +154,7 @@ inline int getOptionChoiceIndex(const char * choiceName, ppd_file_t * ppd)
 }
 
 
-inline void initializeSettings(char * commandLineOptionSettings)
+void initializeSettings(char * commandLineOptionSettings)
 {
 	ppd_file_t *    ppd         = NULL;
 	cups_option_t * options     = NULL;
@@ -180,8 +180,8 @@ inline void initializeSettings(char * commandLineOptionSettings)
 	settings.heatingdots     = getOptionChoiceIndex("HeatingDots"          , ppd);
 	settings.heatingtime     = getOptionChoiceIndex("HeatingTime"          , ppd);
 	settings.heatinginterval     = getOptionChoiceIndex("HeatingInterval"          , ppd);
-	settings.printdensity   = getOptionChoiceIndex("PrintDensity"          , ppd);
-	settings.printbreaktime =  getOptionChoiceIndex("printBreakTime"          , ppd);
+	settings.printdensity   = getOptionChoiceIndex("Density"          , ppd);
+	settings.printbreaktime =  getOptionChoiceIndex("breaktime"          , ppd);
 	
 
 	ppdClose(ppd);
@@ -190,13 +190,16 @@ inline void initializeSettings(char * commandLineOptionSettings)
 // sent on the beginning of print job
 void jobSetup()
 {
+	outputCommand(printerInitializeCommand);
+	
 	if ( settings.cashDrawer1==1 )
 		outputCommand(cashDrawerEject[0]);
 	if ( settings.cashDrawer2==1 )
 		outputCommand(cashDrawerEject[1]);
-	outputCommand(printerInitializeCommand);	
+			
 	setPrintSettings(settings.heatingdots,settings.heatingtime,settings.heatinginterval);
 	setPrintDensity(settings.printdensity,settings.printbreaktime);
+
 }
 
 inline void lineDelay(const char * array, int length)
@@ -205,7 +208,7 @@ inline void lineDelay(const char * array, int length)
 	float sleepus = 0;
 	int dotdelay = (settings.heatingtime * 10) + (settings.heatinginterval * 10) + (settings.printbreaktime * 250);
 	for (;i<length;++i)
-		sleepus += (array[i]/255) * dotdelay;
+		sleepus += array[i]/255 * dotdelay;
 	usleep(sleepus);	
 }	
 
@@ -371,6 +374,7 @@ int main(int argc, char *argv[])
 			rasterheader(width_size,rest);
 			outputarray((char*)rasterData,rest_bytes);
 			skiplines(0);
+			lineDelay((char*)rasterData,rest_bytes);
 		}
 		
 		if (!settings.blankSpace)
