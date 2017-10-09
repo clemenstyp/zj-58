@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <unistd.h>
 
 // uncomment next line in order to have verbose dump in DEBUGFILE
 // after print
@@ -183,6 +184,16 @@ void jobSetup()
 	setPrintSettings(settings.heatingdots,settings.heatingtime,settings.heatinginterval);
 	setPrintDensity(settings.printdensity,settings.printbreaktime)
 }
+
+inline void lineDelay(const char * array, int length)
+{
+	int i = 0;
+	float sleepus = 0
+	int dotdelay = (settings.heatingtime * 10) + (settings.heatinginterval * 10) + (settings.printbreaktime * 250)
+	for (;i<length;++i)
+		sleepus += (array[i]/255) * dotdelay;
+	usleep(sleppus);	
+}	
 
 // sent at the very end of print job
 void ShutDown()
