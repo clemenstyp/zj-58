@@ -131,9 +131,9 @@ inline void setPrintSettings(char heatingdots,char heatingtime,char heatinginter
 //Break time is n(D7-D5)*250us 
 inline void setPrintDensity(char  printBreakTime,char printDensity)
 {
-	mputchar(0x18);       # DC2
-	mputchar(0x35);       # Print density
-	mputchar(((byte) printBreakTime << 5) | (byte) printDensity)
+	mputchar(0x18);       // DC2
+	mputchar(0x35);       // Print density
+	mputchar(((char) printBreakTime << 5) | (char) printDensity);
 }
 
 // get an option
@@ -196,17 +196,17 @@ void jobSetup()
 		outputCommand(cashDrawerEject[1]);
 	outputCommand(printerInitializeCommand);	
 	setPrintSettings(settings.heatingdots,settings.heatingtime,settings.heatinginterval);
-	setPrintDensity(settings.printdensity,settings.printbreaktime)
+	setPrintDensity(settings.printdensity,settings.printbreaktime);
 }
 
 inline void lineDelay(const char * array, int length)
 {
 	int i = 0;
-	float sleepus = 0
-	int dotdelay = (settings.heatingtime * 10) + (settings.heatinginterval * 10) + (settings.printbreaktime * 250)
+	float sleepus = 0;
+	int dotdelay = (settings.heatingtime * 10) + (settings.heatinginterval * 10) + (settings.printbreaktime * 250);
 	for (;i<length;++i)
 		sleepus += (array[i]/255) * dotdelay;
-	usleep(sleppus);	
+	usleep(sleepus);	
 }	
 
 // sent at the very end of print job
