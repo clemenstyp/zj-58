@@ -1,4 +1,4 @@
-// To get required headers, run
+// To get required headers, runf
 // sudo apt-get install libcups2-dev libcupsimage2-dev
 #include <cups/cups.h>
 #include <cups/ppd.h>
@@ -26,6 +26,7 @@ struct settings_
 	int heatinginterval;
 	int printdensity;
 	int printbreaktime;
+	int sleepafter;
 };
 struct settings_ settings;
 
@@ -116,7 +117,7 @@ inline void skiplines(int size)
 //speed. If heating time is too short, blank page may occur.
 //The more heating interval, the more clear, but the slower
 //printingspeed. 
-inline void sleep()
+inline void prtsleep()
 {
 	mputchar(0x1B);       // Esc
 	mputchar(0x38); 
@@ -125,7 +126,7 @@ inline void sleep()
 
 inline void wakeup()
 {
-	if (settings.sleepafter != 0) :
+	if (settings.sleepafter != 0)
 	{
 	     mputchar(0xFF);
 	     usleep(50 * 1000);
@@ -207,7 +208,7 @@ void initializeSettings(char * commandLineOptionSettings)
 // sent on the beginning of print job
 void jobSetup()
 {
-	wakeup()
+	wakeup();
 	outputCommand(printerInitializeCommand);
 	
 	if ( settings.cashDrawer1==1 )
@@ -238,7 +239,7 @@ void ShutDown()
 	if ( settings.cashDrawer2==2 )
 		outputCommand(cashDrawerEject[1]);
 	outputCommand(printerInitializeCommand);
-	sleep()
+	prtsleep();
 }
 
 // sent at the end of every page
