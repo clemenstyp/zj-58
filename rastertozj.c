@@ -116,6 +116,22 @@ inline void skiplines(int size)
 //speed. If heating time is too short, blank page may occur.
 //The more heating interval, the more clear, but the slower
 //printingspeed. 
+inline void sleep()
+{
+	mputchar(0x1B);       // Esc
+	mputchar(0x38); 
+	mputchar(settings.sleepafter);       // 1 sec - 0 = don't sleep)
+}
+
+inline void wakeup()
+{
+	if (settings.sleepafter != 0) :
+	{
+	     mputchar(0xFF);
+	     usleep(50 * 1000);
+	}
+}
+
 inline void setPrintSettings(char heatingdots,char heatingtime,char heatinginterval)
 {
 	mputchar(0x1B);       // Esc
@@ -182,6 +198,7 @@ void initializeSettings(char * commandLineOptionSettings)
 	settings.heatinginterval     = getOptionChoiceIndex("HeatingInterval"          , ppd);
 	settings.printdensity   = getOptionChoiceIndex("Density"          , ppd);
 	settings.printbreaktime =  getOptionChoiceIndex("breaktime"          , ppd);
+	settings.sleepafter =  getOptionChoiceIndex("SleepAfter"          , ppd);
 	
 
 	ppdClose(ppd);
@@ -190,6 +207,7 @@ void initializeSettings(char * commandLineOptionSettings)
 // sent on the beginning of print job
 void jobSetup()
 {
+	wakeup()
 	outputCommand(printerInitializeCommand);
 	
 	if ( settings.cashDrawer1==1 )
@@ -220,6 +238,7 @@ void ShutDown()
 	if ( settings.cashDrawer2==2 )
 		outputCommand(cashDrawerEject[1]);
 	outputCommand(printerInitializeCommand);
+	sleep()
 }
 
 // sent at the end of every page
