@@ -11,7 +11,7 @@
 // uncomment next line in order to have verbose dump in DEBUGFILE
 // after print
 
-#define DEBUGP
+//#define DEBUGP
 
 #define DEBUGFILE "/tmp/debugraster.txt"
 
@@ -59,8 +59,8 @@ inline void mputchar(char c)
 {
     unsigned char m = c;
 #ifdef DEBUGP
-//  if (lfd)
-//      fprintf (lfd,"%02x ",m);
+  if (lfd)
+      fprintf (lfd,"%02x ",m);
 #endif
     putchar(m);
 }
@@ -108,16 +108,6 @@ inline void skiplines(int size)
     mputchar(size);
 }
 
-//Set “max heating dots”,”heating time”, “heating interval”
-//n1 = 0-255 Max printing dots，Unit(8dots)，Default:7(64 dots)
-//n2 = 3-255 Heating time，Unit(10us),Default:80(800us)
-//n3 = 0-255 Heating interval,Unit(10us)，Default:2(20us)
-//The more max heting dots, the more peak current will cost
-//whenprinting, the faster printing speed. The max heating dots is 8*(n1+1)
-//The more heating time, the more density , but the slower printing
-//speed. If heating time is too short, blank page may occur.
-//The more heating interval, the more clear, but the slower
-//printingspeed.
 inline void prtsleep()
 {
 #ifdef DEBUGP
@@ -139,10 +129,20 @@ inline void wakeup()
             fprintf (lfd,"Wake Up Printer\n");
 #endif
          mputchar(0xFF);
-         usleep(50 * 1000);
+         usleep(80 * 1000);
     }
 }
 
+//Set “max heating dots”,”heating time”, “heating interval”
+//n1 = 0-255 Max printing dots，Unit(8dots)，Default:7(64 dots)
+//n2 = 3-255 Heating time，Unit(10us),Default:80(800us)
+//n3 = 0-255 Heating interval,Unit(10us)，Default:2(20us)
+//The more max heting dots, the more peak current will cost
+//whenprinting, the faster printing speed. The max heating dots is 8*(n1+1)
+//The more heating time, the more density , but the slower printing
+//speed. If heating time is too short, blank page may occur.
+//The more heating interval, the more clear, but the slower
+//printingspeed.
 inline void setPrintSettings(int heatingdots,int heatingtime,int heatinginterval)
 {
 #ifdef DEBUGP
@@ -184,10 +184,15 @@ inline int getOptionChoiceIndex(const char * choiceName, ppd_file_t * ppd)
         if ((option = ppdFindOption(ppd, choiceName))          == NULL) return -1;
         if ((choice = ppdFindChoice(option,option->defchoice)) == NULL) return -1;
     }
+#ifdef DEBUGP
+    if (lfd)
+        fprintf (lfd,"Get option : %s : %s\n",choiceName,choice->choice);
+#endif
 
-    if (strcmp(choice->choice,"true"))
+
+    if (strcmp("True",choice->choice) == 0)
         return 1;
-    if (strcmp(choice->choice,"false"))
+    if (strcmp("False",choice->choice) == 0)
         return 0;
 
     return atoi(choice->choice);
@@ -208,11 +213,13 @@ void initializeSettings(char * commandLineOptionSettings)
     if ((numOptions != 0) && (options != NULL))
     {
         cupsMarkOptions(ppd, numOptions, options);
+#ifdef DEBUGP
         for (int i=0;i<numOptions;i++)
-        {
+        {            
             fprintf (lfd,"%s - %s \n",options[i].name,options[i].value);
 
         }
+#endif
         cupsFreeOptions(numOptions, options);
     }
 
@@ -236,12 +243,11 @@ void initializeSettings(char * commandLineOptionSettings)
 void jobSetup()
 {
     wakeup();
-    outputCommand(printerInitializeCommand);
-
     if ( settings.cashDrawer1==1 )
         outputCommand(cashDrawerEject[0]);
     if ( settings.cashDrawer2==1 )
         outputCommand(cashDrawerEject[1]);
+    outputCommand(printerInitializeCommand);
 }
 
 inline void lineDelay(const char * array, int length,int dotdelay)
@@ -249,22 +255,14 @@ inline void lineDelay(const char * array, int length,int dotdelay)
     int i = 0;
     float sleepus = 0;    
     for (;i<length;++i)
-        sleepus += (unsigned int)array[i];
-#ifdef DEBUGP
-    if (lfd)
-        fprintf (lfd,"Software Flow Control, sleep for %f",sleepus);
-#endif
+          sleepus += (unsigned char)array[i];
     sleepus = (sleepus / 255) / length;
-#ifdef DEBUGP
-    if (lfd)
-        fprintf (lfd,"Software Flow Control, sleep for %f",sleepus);
-#endif
     sleepus = sleepus * dotdelay;
 #ifdef DEBUGP
     if (lfd)
-        fprintf (lfd,"Software Flow Control, sleep for %f",sleepus);
+        fprintf (lfd,"Software Flow Control, sleep for %f us",sleepus*100);
 #endif
-    usleep(sleepus/1000);
+    usleep(sleepus*100);
 }
 
 // sent at the very end of print job
