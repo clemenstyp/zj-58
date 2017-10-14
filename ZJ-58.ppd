@@ -103,7 +103,7 @@
 *OpenUI *Darkness/Darkness: PickOne
 *OrderDependency: 20 AnySetup *Darkness
 *DefaultDarkness: Normal
-*Darkness Light: "<</cupsInteger0 2/cupsInteger1 10/cupsInteger2 4>>setpagedevice"
+*Darkness Light: "<</cupsInteger0 2/cupsInteger1 15/cupsInteger2 4>>setpagedevice"
 *Darkness Medium: "<</cupsInteger0 4/cupsInteger1 40/cupsInteger2 10>>setpagedevice"
 *Darkness Normal: "<</cupsInteger0 7/cupsInteger1 80/cupsInteger2 20>>setpagedevice"
 *Darkness Dark: "<</cupsInteger0 12/cupsInteger1 120/cupsInteger2 30>>setpagedevice"
@@ -120,9 +120,9 @@
 *OpenUI Density/Density  : PickOne
 *OrderDensity: 10 AnySetup *Density
 *DefaultDensity: Medium
-*Density Low: "<</cupsInteger3 4/cupsInteger4 4>>setpagedevice"
-*Density Medium: "<</cupsInteger3 4/cupsInteger4 4>>setpagedevice"
-*Density High: "<</cupsInteger3 4/cupsInteger4 4>>setpagedevice"
+*Density Low: "<</cupsInteger3 4/cupsInteger4 1>>setpagedevice"
+*Density Medium: "<</cupsInteger3 16/cupsInteger4 4>>setpagedevice"
+*Density High: "<</cupsInteger3 32/cupsInteger4 8>>setpagedevice"
 *CloseUI: *Density
 
 *% Custom Density option
