@@ -274,7 +274,7 @@ void jobSetup()
 
 inline void lineDelay(const char * array, int length,int dotdelay)
 {
-    int i = 4;
+    int i = 0;
     float sleepus = 0;    
     for (;i<length;++i)
           sleepus += count(array[i]);
