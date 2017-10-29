@@ -108,6 +108,28 @@ inline void skiplines(int size)
     mputchar(size);
 }
 
+int count(unsigned char byte)
+{
+    static const int ones[256] =  
+    {0,1,1,2,1,2,2,3,1,2,2,3,2,3,3,4,
+    1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,1,2,2,
+    3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,
+    4,5,3,4,4,5,4,5,5,6,1,2,2,3,2,3,3,4,2,
+    3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,
+    4,5,5,6,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,
+    6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,1,2,
+    2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,
+    4,4,5,3,4,4,5,4,5,5,6,2,3,3,4,3,4,4,5,
+    3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,
+    6,5,6,6,7,2,3,3,4,3,4,4,5,3,4,4,5,4,5,
+    5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,3,
+    4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,4,5,5,6,
+    5,6,6,7,5,6,6,7,6,7,7,8};
+
+    return ones[(int)byte];
+}
+
+
 inline void prtsleep()
 {
 #ifdef DEBUGP
@@ -252,10 +274,10 @@ void jobSetup()
 
 inline void lineDelay(const char * array, int length,int dotdelay)
 {
-    int i = 0;
+    int i = 4;
     float sleepus = 0;    
     for (;i<length;++i)
-          sleepus += (unsigned char)array[i];
+          sleepus += count(array[i]);
     sleepus = (sleepus / 255) / length;
     sleepus = sleepus * dotdelay;
 #ifdef DEBUGP
