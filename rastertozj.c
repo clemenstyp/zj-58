@@ -278,7 +278,6 @@ inline void lineDelay(const char * array, int length,int dotdelay)
     float sleepus = 0;    
     for (;i<length;++i)
           sleepus += count(array[i]);
-    sleepus = (sleepus / 255) / length;
     sleepus = sleepus * dotdelay;
 #ifdef DEBUGP
     if (lfd)
